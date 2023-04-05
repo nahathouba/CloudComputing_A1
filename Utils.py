@@ -1,11 +1,7 @@
 import boto3
 import json
 import time
-
-aws_access_key_id = "ASIASEPGD37DVWPOULRT"
-aws_secret_access_key = "7CVojM0GYvHH/PKkS0NegBYPhCJZKsiakh4vJGBZ"
-aws_session_token = "FwoGZXIvYXdzEDcaDJ28M8awHlMpi/7kUiLNAUJu8l522ivOnUKkNCPWVaIn1EmPg+aBgYGDwq/jcs8tjbsK2DD24o8Mu1I/4NNCGQZ4ns7hMvtgdUYr7hBWHOcTHYqmKLDYFIYYggDcH00Q/NISnWN0ViDTDNdbQr4CxMVXzvbvXeJQRPq5yU6YCoI8HYkgg8tO9DI9R5c7QDJDC1JUkqnRzQ/FZvoOY5WzNIlClgXCitwUbHE7iXd5zkE+EmHTiz/9qoHVXMj31MtkTKq3Gdf+xALBPCgQbA3O1rIxZSLpOhn7blYKHM8o/pK0oQYyLbBXKnBFBO0pGvxr2GEm2pE4UvTeImz/rJBiuzErBBsAKPts8TNI43Fl3jiEIA=="
-region_name = "us-east-1"
+from AWS_Creds import *
 
 loginTableName = 'login'
 musicTableName = 'music'
