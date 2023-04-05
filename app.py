@@ -1,13 +1,18 @@
 from flask import Flask, render_template, request
-from Utils import tableExists, createTable, putUsers
+from Utils import tableExists, createLogInTable, createMusicTable
 
 app = Flask(__name__)
 
 
 isTableExist = tableExists('login')
 if not isTableExist:
-    # Create the login table
-    createTable()
+    # Create the login table and load the users
+    createLogInTable()
+
+isTableExist = tableExists('music')
+if not isTableExist:
+    # Create the music table and load the music
+    createMusicTable()
 
 
 @ app.route("/")
