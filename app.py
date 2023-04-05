@@ -1,16 +1,13 @@
 from flask import Flask, render_template, request
-from CreateLoginTable import CreateLoginTable
-
-aws_access_key_id = "ASIASEPGD37DX2M43UHA"
-aws_secret_access_key = "WIWF9TlbzxDOeCa+tfkZ2Qghst0v6SgJe1VLebVa"
-aws_session_token = "FwoGZXIvYXdzEDIaDH/OYLTkluz23QUO7iLNAd1kOELMaU5wR+oXClY6Y5Bc2vSmC19DvZq81H00Hf5jPebEWDG0pWQkXmaIOypyBI3JG1mNyTk8PZ+z6xFyA1uiZrmFnFSf2nnFqRpwkap9qAC/WyNRiJuzNT9dTt6ZLbrkF5DLXUNehRMuW/yOhsonWWaSXDF+2F4eghoLiY9wCGbyUu51zqpvVyyteMd+10CnVmb+SURwMKNIsuVUqTMayt48r49cm6kStuyMmbTBShM1WOvWEdG69pToOPW7MbzCDYCD+w/wKtEcLtwog/myoQYyLYDWUUzHSbRxpumU9jze0EXVBFeSUf2mycCeGK9AdF1AtsOdBEDoOBKYgbjiHw=="
-region_name = "us-east-1"
+from Utils import tableExists, createTable, putUsers
 
 app = Flask(__name__)
 
-createLoginTable = CreateLoginTable(
-    aws_access_key_id, aws_secret_access_key, aws_session_token, region_name)
-createLoginTable.createTable()
+
+isTableExist = tableExists('login')
+if not isTableExist:
+    # Create the login table
+    createTable()
 
 
 @ app.route("/")
