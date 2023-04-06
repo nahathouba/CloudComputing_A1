@@ -5,7 +5,7 @@ import os
 import requests
 from AWS_Creds import *
 
-BUCKET_NAME = 'artist_images'
+BUCKET_NAME = 's3733745-artist-images'
 A1_JSON_PATH = 'a1.json'
 IMAGE_TEMP_DIR = './temp'
 
@@ -13,20 +13,14 @@ s3Client = boto3.client(
     's3',
     aws_access_key_id=aws_access_key_id,
     aws_secret_access_key=aws_secret_access_key,
+    aws_session_token=aws_session_token,
     region_name=region_name
 )
 
 
 def createArtistImageBucket():
-    try:
-        s3Client.head_bucket(Bucket=BUCKET_NAME)
-        print(f"Bucket {BUCKET_NAME} already exists")
-    except Exception as e:
-        if 'Not Found' in str(e):
-            s3Client.create_bucket(Bucket=BUCKET_NAME)
-            print(f"Bucket {BUCKET_NAME} created")
-        else:
-            print(f"Error Creating Bucket {BUCKET_NAME}: {e}")
+    s3Client.create_bucket(Bucket=BUCKET_NAME)
+    print(f"Bucket {BUCKET_NAME} created")
 
 
 def downloadArtistImage():
@@ -51,3 +45,14 @@ def downloadArtistImage():
                 f.write(response.content)
                 f.close()
                 print(f"Image Downloaded: {imgName}")
+
+
+def uploadArtistImageS3():
+    if not os.path.exists(IMAGE_TEMP_DIR):
+        print(f"Local Directory {IMAGE_TEMP_DIR} does not exist")
+        return
+
+    for img in os.listdir(IMAGE_TEMP_DIR):
+        localFilePath = os.path.join(IMAGE_TEMP_DIR, img)
+        s3Client.upload_file(localFilePath, BUCKET_NAME, img)
+        print(f"Image Uploaded: {img}")
