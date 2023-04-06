@@ -15,9 +15,11 @@ if not isTableExist:
     # Create the music table and load the music
     createMusicTable()
 
-# Download the artist images from the URL
+# Create the artist image S3 bucket
 createArtistImageBucket()
+# Download the artist images from the URL
 downloadArtistImage()
+# Upload the artist images to the S3 bucket
 uploadArtistImageS3()
 
 

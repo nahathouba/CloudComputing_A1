@@ -19,8 +19,15 @@ s3Client = boto3.client(
 
 
 def createArtistImageBucket():
-    s3Client.create_bucket(Bucket=BUCKET_NAME)
-    print(f"Bucket {BUCKET_NAME} created")
+    try:
+        s3Client.head_bucket(Bucket=BUCKET_NAME)
+        print(f"Bucket {BUCKET_NAME} already exists.")
+    except Exception as e:
+        if 'Not Found' in str(e):
+            s3Client.create_bucket(Bucket=BUCKET_NAME)
+            print(f"Bucket {BUCKET_NAME} created.")
+        else:
+            print(f"Error checking bucket {BUCKET_NAME}: {e}")
 
 
 def downloadArtistImage():
