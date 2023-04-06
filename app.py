@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from Utils import tableExists, createLogInTable, createMusicTable
+from S3Utils import downloadArtistImage
 
 app = Flask(__name__)
 
@@ -13,6 +14,8 @@ isTableExist = tableExists('music')
 if not isTableExist:
     # Create the music table and load the music
     createMusicTable()
+
+downloadArtistImage()
 
 
 @ app.route("/")
