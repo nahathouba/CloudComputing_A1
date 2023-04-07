@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
-from utils import tableExists, createLogInTable, createMusicTable, createUser, userExists
+from utils import tableExists, createLogInTable, createMusicTable, createUser, userExists, verifyUser
 from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket
 from forms import RegisterForm, LoginForm
 
@@ -59,7 +59,7 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'nahakpamningthouba@gmail.com' and form.password.data == 'password':
+        if verifyUser(form.email.data, form.password.data):
             flash('You have been logged in!', 'success')
             return redirect(url_for('index'))
         else:
