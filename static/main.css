@@ -12,6 +12,12 @@ body {
     background-color: #5f788a;
   }
 
+  .bordered-section {
+    border: 5px solid #141414;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
   .content-section {
     background: #ffffff;
     padding: 10px 20px;

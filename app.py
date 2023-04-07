@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, url_for, flash, redirect
-from utils import tableExists, createLogInTable, createMusicTable, createUser, userExists, verifyUser
+from flask import Flask, render_template, request, url_for, flash, redirect, session
+from utils import tableExists, createLogInTable, createMusicTable, createUser, userExists, verifyUser, getUserName
 from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket
 from forms import RegisterForm, LoginForm
 
@@ -32,7 +32,13 @@ def index():
 
 @ app.route('/home')
 def home():
-    return render_template("home.html")
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    # TODO: Fetch user subscriptions from DynamoDB
+    subscriptions = []
+
+    return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions)
 
 
 @ app.route('/register', methods=['GET', 'POST'])
@@ -60,11 +66,18 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         if verifyUser(form.email.data, form.password.data):
+            session['username'] = getUserName(form.email.data)
             flash('You have been logged in!', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('home'))
         else:
             flash('Login Unsuccessful! Email or Password is invalid.', 'danger')
     return render_template("login.html", form=form, title='Login')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('login'))
 
 
 if __name__ == "__main__":
