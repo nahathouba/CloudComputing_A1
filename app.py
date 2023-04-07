@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
-from utils import tableExists, createLogInTable, createMusicTable
+from utils import tableExists, createLogInTable, createMusicTable, createUser, userExists
 from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket
 from forms import RegisterForm, LoginForm
 
@@ -30,12 +30,28 @@ def index():
     return render_template("index.html")
 
 
+@ app.route('/home')
+def home():
+    return render_template("home.html")
+
+
 @ app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        flash(f'Account created for {form.username.data}!', 'success')
-        return redirect(url_for('login'))
+        userRigestered = userExists(form.email.data)
+        if not userRigestered:
+            newUser = {
+                "email": form.email.data,
+                "username": form.username.data,
+                "password": form.password.data
+            }
+            createUser(newUser)
+            flash(f'Account created for {form.username.data}!', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash(f'The email {form.email.data} already exists!', 'danger')
+
     return render_template("register.html", form=form, title='Register')
 
 
