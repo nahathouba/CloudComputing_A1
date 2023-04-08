@@ -1,8 +1,8 @@
 import boto3
 import json
-import time
 import os
 import requests
+from botocore.exceptions import ClientError
 from AWS_Creds import *
 
 BUCKET_NAME = 's3733745-artist-images'
@@ -36,7 +36,7 @@ def downloadArtistImage():
 
     for img in imageData['songs']:
         imgURL = img['img_url']
-        imgName = img['title']
+        imgName = img['artist']
         response = requests.get(imgURL)
         if response.status_code == 200:
             if not os.path.exists(IMAGE_TEMP_DIR):
@@ -61,5 +61,17 @@ def uploadArtistImageS3():
 
     for img in os.listdir(IMAGE_TEMP_DIR):
         localFilePath = os.path.join(IMAGE_TEMP_DIR, img)
-        s3Client.upload_file(localFilePath, BUCKET_NAME, img)
+        s3Client.upload_file(localFilePath, BUCKET_NAME,
+                             img, ExtraArgs={'ACL': 'public-read'})
         print(f"Image Uploaded: {img}")
+
+
+def bucketExists():
+    try:
+        s3Client.head_bucket(Bucket=BUCKET_NAME)
+        return True
+    except ClientError as e:
+        if e.response['Error']['Code'] == '404':
+            return False
+        else:
+            raise
