@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, flash, redirect, session
 from utils import tableExists, createLogInTable, createMusicTable, createUser, userExists, verifyUser, getUserName
-from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket
+from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket, bucketExists
+from subscriptionUtils import createMusicSubscriptionTable, getMusicSubscriptions, removeMusicSubscriptionS3
 from forms import RegisterForm, LoginForm
 
 app = Flask(__name__)
@@ -18,11 +19,14 @@ app.config['SECRET_KEY'] = '8693f210b860a5ab14b3269295d1d203'
 # createMusicTable()
 
 # Create the artist image S3 bucket
-# createArtistImageBucket()
+if not bucketExists():
+    createArtistImageBucket()
 # Download the artist images from the URL
 # downloadArtistImage()
 # Upload the artist images to the S3 bucket
 # uploadArtistImageS3()
+
+# createMusicSubscriptionTable()
 
 
 @ app.route('/')
@@ -35,8 +39,7 @@ def home():
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    # TODO: Fetch user subscriptions from DynamoDB
-    subscriptions = []
+    subscriptions = getMusicSubscriptions(session['email'])
 
     return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions)
 
@@ -67,6 +70,7 @@ def login():
     if form.validate_on_submit():
         if verifyUser(form.email.data, form.password.data):
             session['username'] = getUserName(form.email.data)
+            session['email'] = form.email.data
             flash('You have been logged in!', 'success')
             return redirect(url_for('home'))
         else:
@@ -77,7 +81,19 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('email', None)
     return redirect(url_for('login'))
+
+
+@app.route('/removeMusicSubscription/<string:musicTitle>', methods=['GET'])
+def removeMusicSubscription(musicTitle):
+    removed = removeMusicSubscriptionS3(session['email'], musicTitle)
+    if removed:
+        flash(f'Subscription removed for {musicTitle}!', 'success')
+        return redirect(url_for('home'))
+    else:
+        flash(f'Error removing subscription for {musicTitle}!', 'danger')
+        return redirect(url_for('home'))
 
 
 if __name__ == "__main__":

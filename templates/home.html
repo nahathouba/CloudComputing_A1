@@ -7,16 +7,18 @@
     </div>
 
     <div class="border p-3 mb-3">
-        <h3 class="mt-3">Subscription Area</h3>
+        <h3 class="mt-3">Subscribed Songs</h3>
         <div id="subscription-area" class="row">
             {% for subscription in subscriptions %}
                 <div class="col-4">
                     <div class="card">
-                        <!-- TODO: Display subscription information and artist image from S3 -->
+                        {% set artistName = subscription.artist %}
+                        {% set s3_url = "https://s3733745-artist-images.s3.amazonaws.com/" + artistName + ".jpg" %}
+                        <img src="{{ s3_url }}" class="card-img-top" alt="Music Image">
                         <div class="card-body">
-                            <h5 class="card-title">Title</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Artist - Year</h6>
-                            <button class="btn btn-danger">Remove</button>
+                            <h5 class="card-title">{{subscription.title}}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{subscription.artist}} - {{subscription.year}}</h6>
+                            <a class="btn btn-danger btn-sm" href="{{ url_for('removeMusicSubscription', musicTitle=subscription.title)}}">Remove</a>
                         </div>
                     </div>
                 </div>
@@ -25,7 +27,7 @@
     </div>
 
     <div class="border p-3 mb-3">
-        <h3 class="mt-3">Query Area</h3>
+        <h3 class="mt-3">Search</h3>
         <form id="query-form" class="row g-3">
             <div class="col-md-4">
                 <label for="title" class="form-label">Title</label>
