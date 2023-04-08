@@ -1,47 +1,62 @@
 from flask import Flask, render_template, request, url_for, flash, redirect, session
-from utils import tableExists, createLogInTable, createMusicTable, createUser, userExists, verifyUser, getUserName
+from dynamoUtils import tableExists, createLogInTable, createMusicTable, createUser, userExists, verifyUser, getUserName
 from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket, bucketExists
-from subscriptionUtils import createMusicSubscriptionTable, getMusicSubscriptions, removeMusicSubscriptionS3
-from forms import RegisterForm, LoginForm
+from subscriptionUtils import createMusicSubscriptionTable, getMusicSubscriptions, removeMusicSubscriptionS3, addMusicSubscriptionS3
+from musicUtils import searchMusic
+from forms import RegisterForm, LoginForm, MusicSearchForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8693f210b860a5ab14b3269295d1d203'
 
 
-# isTableExist = tableExists('login')
-# if not isTableExist:
-# Create the login table and load the users
-# createLogInTable()
+isLoginTableExist = tableExists('login')
+if not isLoginTableExist:
+    # Create the login table and load the users if not exist
+    createLogInTable()
 
-# isTableExist = tableExists('music')
-# if not isTableExist:
-# Create the music table and load the music
-# createMusicTable()
+isMusicTableExist = tableExists('music')
+if not isMusicTableExist:
+    # Create the music table and load the music if not exist
+    createMusicTable()
 
 # Create the artist image S3 bucket
 if not bucketExists():
     createArtistImageBucket()
-# Download the artist images from the URL
-# downloadArtistImage()
-# Upload the artist images to the S3 bucket
-# uploadArtistImageS3()
+    # Download the artist images from the URL
+    downloadArtistImage()
+    # Upload the artist images to the S3 bucket
+    uploadArtistImageS3()
 
-# createMusicSubscriptionTable()
+isSubscriptionTableExist = tableExists('user-music-subscriptions')
+if not isSubscriptionTableExist:
+    # Create the user music subscribtion table if not exist
+    createMusicSubscriptionTable()
 
 
 @ app.route('/')
 def index():
-    return render_template("index.html")
+    return redirect(url_for('home'))
 
 
-@ app.route('/home')
+@ app.route('/home', methods=['GET', 'POST'])
 def home():
     if 'username' not in session:
         return redirect(url_for('login'))
 
     subscriptions = getMusicSubscriptions(session['email'])
+    returnMusic = []
 
-    return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions)
+    form = MusicSearchForm()
+    if form.validate_on_submit():
+        returnMusic = searchMusic(
+            form.title.data, form.year.data, form.artist.data
+        )
+        if returnMusic != []:
+            return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions, musics=returnMusic, form=form)
+        else:
+            flash(f'No result is retrieved!', 'danger')
+
+    return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions, musics=returnMusic, form=form)
 
 
 @ app.route('/register', methods=['GET', 'POST'])
@@ -93,6 +108,17 @@ def removeMusicSubscription(musicTitle):
         return redirect(url_for('home'))
     else:
         flash(f'Error removing subscription for {musicTitle}!', 'danger')
+        return redirect(url_for('home'))
+
+
+@app.route('/addMusicSubscription/<string:musicTitle>', methods=['GET'])
+def addMusicSubscription(musicTitle):
+    added = addMusicSubscriptionS3(session['email'], musicTitle)
+    if added:
+        flash(f'Subscription added for {musicTitle}!', 'success')
+        return redirect(url_for('home'))
+    else:
+        flash(f'Error adding subscription for {musicTitle}!', 'danger')
         return redirect(url_for('home'))
 
 

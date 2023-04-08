@@ -17,3 +17,10 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[
                              DataRequired(), Length(min=2)])
     submit = SubmitField('Login')
+
+
+class MusicSearchForm(FlaskForm):
+    title = StringField('Title')
+    year = StringField('Year')
+    artist = StringField('Artist')
+    submit = SubmitField('Search')

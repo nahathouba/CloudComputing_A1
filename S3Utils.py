@@ -64,6 +64,7 @@ def uploadArtistImageS3():
         s3Client.upload_file(localFilePath, BUCKET_NAME,
                              img, ExtraArgs={'ACL': 'public-read'})
         print(f"Image Uploaded: {img}")
+        os.remove(localFilePath)
 
 
 def bucketExists():

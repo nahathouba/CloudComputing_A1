@@ -44,14 +44,16 @@ def createMusicSubscriptionTable():
     print("Music Subscription Table status:", table.table_status)
 
 
-def putMusicSubscription(user_email, music_title):
+def addMusicSubscriptionS3(userEmail, musicTitle):
     table = dynamodb.Table(SUBSCRIPTION_TABLE_NAME)
     table.put_item(
         Item={
-            'user_email': user_email,
-            'music_title': music_title
+            'user_email': userEmail,
+            'music_title': musicTitle
         }
     )
+    isMusicSubscribed = musicSubcriptionExists(userEmail, musicTitle)
+    return isMusicSubscribed
 
 
 def getMusicSubscriptions(userEmail):
@@ -86,13 +88,13 @@ def musicSubcriptionExists(user_email, music_title):
     return 'Item' in response
 
 
-def removeMusicSubscriptionS3(user_email, music_title):
+def removeMusicSubscriptionS3(userEmail, musicTitle):
     table = dynamodb.Table(SUBSCRIPTION_TABLE_NAME)
     table.delete_item(
         Key={
-            'user_email': user_email,
-            'music_title': music_title
+            'user_email': userEmail,
+            'music_title': musicTitle
         }
     )
-    isMusicStillSubscribed = musicSubcriptionExists(user_email, music_title)
+    isMusicStillSubscribed = musicSubcriptionExists(userEmail, musicTitle)
     return not isMusicStillSubscribed
