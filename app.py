@@ -1,18 +1,19 @@
-from flask import Flask, render_template, request, url_for, flash, redirect, session
-from dynamoUtils import tableExists, createLogInTable, createMusicTable, createUser, userExists, verifyUser, getUserName
+from flask import Flask, render_template, url_for, flash, redirect, session
+from dynamoUtils import tableExists, createMusicTable, createUser, userExists, verifyUser, getUserName
 from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket, bucketExists, isImagesUploaded
 from subscriptionUtils import createMusicSubscriptionTable, getMusicSubscriptions, removeMusicSubscriptionS3, addMusicSubscriptionS3
 from musicUtils import searchMusic
 from forms import RegisterForm, LoginForm, MusicSearchForm
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8693f210b860a5ab14b3269295d1d203'
 
 
-isLoginTableExist = tableExists('login')
-if not isLoginTableExist:
-    # Create the login table and load the users if not exist
-    createLogInTable()
+# isLoginTableExist = tableExists('login')
+# if not isLoginTableExist:
+# Create the login table and load the users if not exist
+# createLogInTable()
 
 isMusicTableExist = tableExists('music')
 if not isMusicTableExist:
@@ -42,6 +43,9 @@ if not isImagesUploaded():
 
 @ app.route('/')
 def index():
+    response = requests.get(
+        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createLoginTable')
+    print(response)
     return redirect(url_for('home'))
 
 
