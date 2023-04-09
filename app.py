@@ -32,6 +32,10 @@ def index():
         'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createLoginTable')  # Lambda function API Gateway address to create the login table
     print(response1)
 
+    response2 = requests.get(
+        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createMusicTable')  # Lambda function API Gateway address to create the music table
+    print(response2)
+
     return redirect(url_for('home'))
 
 
@@ -78,9 +82,6 @@ def register():
 
 @ app.route('/login', methods=['GET', 'POST'])
 def login():
-    response2 = requests.get(
-        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createMusicTable')  # Lambda function API Gateway address to create the music table
-    print(response2)
     form = LoginForm()
     if form.validate_on_submit():
         if verifyUser(form.email.data, form.password.data):
