@@ -10,16 +10,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '8693f210b860a5ab14b3269295d1d203'
 
 
-# isLoginTableExist = tableExists('login')
-# if not isLoginTableExist:
-# Create the login table and load the users if not exist
-# createLogInTable()
-
-isMusicTableExist = tableExists('music')
-if not isMusicTableExist:
-    # Create the music table and load the music if not exist
-    createMusicTable()
-
 # Create the artist image S3 bucket
 if not bucketExists():
     createArtistImageBucket()
@@ -27,11 +17,6 @@ if not bucketExists():
     downloadArtistImage()
     # Upload the artist images to the S3 bucket
     uploadArtistImageS3()
-
-isSubscriptionTableExist = tableExists('user-music-subscriptions')
-if not isSubscriptionTableExist:
-    # Create the user music subscribtion table if not exist
-    createMusicSubscriptionTable()
 
 # Check still no the images are uploaded to the S3 bucket
 if not isImagesUploaded():
@@ -44,7 +29,11 @@ if not isImagesUploaded():
 @ app.route('/')
 def index():
     response = requests.get(
-        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createLoginTable')
+        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createLoginTable')  # Lambda function API Gateway address to create the login table
+
+    response = requests.get(
+        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createMusicTable')  # Lambda function API Gateway address to create the music table
+
     print(response)
     return redirect(url_for('home'))
 
