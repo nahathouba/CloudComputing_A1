@@ -11,12 +11,12 @@ app.config['SECRET_KEY'] = '8693f210b860a5ab14b3269295d1d203'
 
 
 # Create the artist image S3 bucket
-if not bucketExists():
-    createArtistImageBucket()
-    # Download the artist images from the URL
-    downloadArtistImage()
-    # Upload the artist images to the S3 bucket
-    uploadArtistImageS3()
+# if not bucketExists():
+# createArtistImageBucket()
+# Download the artist images from the URL
+# downloadArtistImage()
+# Upload the artist images to the S3 bucket
+# uploadArtistImageS3()
 
 # Check still no the images are uploaded to the S3 bucket
 if not isImagesUploaded():
