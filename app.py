@@ -28,13 +28,13 @@ if not isImagesUploaded():
 
 @ app.route('/')
 def index():
-    response = requests.get(
+    response1 = requests.get(
         'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createLoginTable')  # Lambda function API Gateway address to create the login table
+    print(response1)
 
-    response = requests.get(
+    response2 = requests.get(
         'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createMusicTable')  # Lambda function API Gateway address to create the music table
-
-    print(response)
+    print(response2)
     return redirect(url_for('home'))
 
 
