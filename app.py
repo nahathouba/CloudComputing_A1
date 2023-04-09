@@ -36,6 +36,10 @@ def index():
         'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createMusicTable')  # Lambda function API Gateway address to create the music table
     print(response2)
 
+    response3 = requests.get(
+        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createMusicTable')  # Lambda function API Gateway address to create s3 bucket and download the artists images and upload them to the s3 bucket
+    print(response3)
+
     return redirect(url_for('home'))
 
 
