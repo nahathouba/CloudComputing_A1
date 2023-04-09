@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 from AWS_Creds import *
 
 BUCKET_NAME = 's3733745-artist-images'
-A1_JSON_PATH = 'a1.json'
+A1_JSON_PATH = './a1.json'
 IMAGE_TEMP_DIR = './temp'
 
 s3Client = boto3.client(
@@ -76,3 +76,12 @@ def bucketExists():
             return False
         else:
             raise
+
+
+def isImagesUploaded():
+    response = s3Client.list_objects_v2(Bucket=BUCKET_NAME)
+
+    if 'Contents' in response:
+        return True
+
+    return False

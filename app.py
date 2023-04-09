@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, flash, redirect, session
 from dynamoUtils import tableExists, createLogInTable, createMusicTable, createUser, userExists, verifyUser, getUserName
-from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket, bucketExists
+from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket, bucketExists, isImagesUploaded
 from subscriptionUtils import createMusicSubscriptionTable, getMusicSubscriptions, removeMusicSubscriptionS3, addMusicSubscriptionS3
 from musicUtils import searchMusic
 from forms import RegisterForm, LoginForm, MusicSearchForm
@@ -31,6 +31,13 @@ isSubscriptionTableExist = tableExists('user-music-subscriptions')
 if not isSubscriptionTableExist:
     # Create the user music subscribtion table if not exist
     createMusicSubscriptionTable()
+
+# Check still no the images are uploaded to the S3 bucket
+if not isImagesUploaded():
+    # Download the artist images from the URL
+    downloadArtistImage()
+    # Upload the artist images to the S3 bucket
+    uploadArtistImageS3()
 
 
 @ app.route('/')
