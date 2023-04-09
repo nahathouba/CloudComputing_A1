@@ -1,0 +1,5 @@
+boto3
+requests
+flask_wtf
+email_validator
+gunicorn
