@@ -1,6 +1,5 @@
 from flask import Flask, render_template, url_for, flash, redirect, session
 from dynamoUtils import createUser, userExists, verifyUser, getUserName
-from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket, bucketExists, isImagesUploaded
 from subscriptionUtils import getMusicSubscriptions, removeMusicSubscriptionS3, addMusicSubscriptionS3
 from musicUtils import searchMusic
 from forms import RegisterForm, LoginForm, MusicSearchForm
@@ -18,13 +17,6 @@ app.config['SECRET_KEY'] = '8693f210b860a5ab14b3269295d1d203'
 # Upload the artist images to the S3 bucket
 # uploadArtistImageS3()
 
-# Check still no the images are uploaded to the S3 bucket
-if not isImagesUploaded():
-    # Download the artist images from the URL
-    downloadArtistImage()
-    # Upload the artist images to the S3 bucket
-    uploadArtistImageS3()
-
 
 @ app.route('/')
 def index():
@@ -37,7 +29,7 @@ def index():
     print(response2)
 
     response3 = requests.get(
-        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createMusicTable')  # Lambda function API Gateway address to create s3 bucket and download the artists images and upload them to the s3 bucket
+        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createBucket')  # Lambda function API Gateway address to create s3 bucket and download the artists images and upload them to the s3 bucket
     print(response3)
 
     return redirect(url_for('home'))
