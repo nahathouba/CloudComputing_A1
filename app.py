@@ -21,15 +21,15 @@ app.config['SECRET_KEY'] = '8693f210b860a5ab14b3269295d1d203'
 @ app.route('/')
 def index():
     response1 = requests.get(
-        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createLoginTable')  # Lambda function API Gateway address to create the login table
+        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createLoginTable', timeout=30)  # Lambda function API Gateway address to create the login table
     print(response1)
 
     response2 = requests.get(
-        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createMusicTable')  # Lambda function API Gateway address to create the music table
+        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createMusicTable', timeout=30)  # Lambda function API Gateway address to create the music table
     print(response2)
 
     response3 = requests.get(
-        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createBucket')  # Lambda function API Gateway address to create s3 bucket and download the artists images and upload them to the s3 bucket
+        'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createBucket', timeout=60)  # Lambda function API Gateway address to create s3 bucket and download the artists images and upload them to the s3 bucket
     print(response3)
 
     return redirect(url_for('home'))
