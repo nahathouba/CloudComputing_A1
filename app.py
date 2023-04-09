@@ -1,7 +1,7 @@
 from flask import Flask, render_template, url_for, flash, redirect, session
-from dynamoUtils import tableExists, createMusicTable, createUser, userExists, verifyUser, getUserName
+from dynamoUtils import createUser, userExists, verifyUser, getUserName
 from s3Utils import downloadArtistImage, uploadArtistImageS3, createArtistImageBucket, bucketExists, isImagesUploaded
-from subscriptionUtils import createMusicSubscriptionTable, getMusicSubscriptions, removeMusicSubscriptionS3, addMusicSubscriptionS3
+from subscriptionUtils import getMusicSubscriptions, removeMusicSubscriptionS3, addMusicSubscriptionS3
 from musicUtils import searchMusic
 from forms import RegisterForm, LoginForm, MusicSearchForm
 import requests
