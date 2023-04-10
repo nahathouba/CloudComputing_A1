@@ -32,7 +32,6 @@ def home():
 
     subscriptions = getMusicSubscriptions(session['email'])
     returnMusic = []
-    res = None
 
     form = MusicSearchForm()
     if form.validate_on_submit():
@@ -48,9 +47,10 @@ def home():
             if form.year.data:
                 params['year'] = form.year.data
             res = requests.get(url, params=params)
+            if res.status_code == 200:
+                returnMusic = res.json()
 
-    if res.status_code == 200:
-        returnMusic = res.json()
+    if returnMusic != []:
         return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions, musics=returnMusic, form=form)
     else:
         flash(f'No result is retrieved!', 'danger')
