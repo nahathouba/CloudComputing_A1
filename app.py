@@ -50,10 +50,10 @@ def home():
             if res.status_code == 200:
                 returnMusic = res.json()
 
-    if returnMusic != []:
-        return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions, musics=returnMusic, form=form)
-    else:
-        flash(f'No result is retrieved!', 'danger')
+        if returnMusic != []:
+            return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions, musics=returnMusic, form=form)
+        else:
+            flash(f'No result is retrieved!', 'danger')
 
     return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions, musics=returnMusic, form=form)
 

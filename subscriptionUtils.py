@@ -14,37 +14,6 @@ dynamodb = boto3.resource(
 )
 
 
-def createMusicSubscriptionTable():
-    table = dynamodb.create_table(
-        TableName=SUBSCRIPTION_TABLE_NAME,
-        KeySchema=[
-            {
-                'AttributeName': 'user_email',
-                'KeyType': 'HASH'  # Partition key
-            },
-            {
-                'AttributeName': 'music_title',
-                'KeyType': 'RANGE'  # Sort key
-            }
-        ],
-        AttributeDefinitions=[
-            {
-                'AttributeName': 'user_email',
-                'AttributeType': 'S'
-            },
-            {
-                'AttributeName': 'music_title',
-                'AttributeType': 'S'
-            }
-        ],
-        ProvisionedThroughput={
-            'ReadCapacityUnits': 5,
-            'WriteCapacityUnits': 5
-        }
-    )
-    print("Music Subscription Table status:", table.table_status)
-
-
 def addMusicSubscriptionS3(userEmail, musicTitle):
     table = dynamodb.Table(SUBSCRIPTION_TABLE_NAME)
     table.put_item(
@@ -62,8 +31,10 @@ def getMusicSubscriptions(userEmail):
         str(userEmail)
 
     response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
 
-    return response.json()
+    return []
 
 
 def musicSubcriptionExists(user_email, music_title):
