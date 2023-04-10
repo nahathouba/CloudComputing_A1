@@ -1,7 +1,6 @@
 from flask import Flask, render_template, url_for, flash, redirect, session
 from dynamoUtils import createUser, userExists, verifyUser, getUserName
 from subscriptionUtils import getMusicSubscriptions, removeMusicSubscriptionS3, addMusicSubscriptionS3
-from musicUtils import searchMusic
 from forms import RegisterForm, LoginForm, MusicSearchForm
 import requests
 
@@ -9,16 +8,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '8693f210b860a5ab14b3269295d1d203'
 
 
-# Create the artist image S3 bucket
-# if not bucketExists():
-# createArtistImageBucket()
-# Download the artist images from the URL
-# downloadArtistImage()
-# Upload the artist images to the S3 bucket
-# uploadArtistImageS3()
-
-
-@ app.route('/')
+@app.route('/')
 def index():
     response1 = requests.get(
         'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/createLoginTable', timeout=30)  # Lambda function API Gateway address to create the login table
@@ -35,28 +25,40 @@ def index():
     return redirect(url_for('home'))
 
 
-@ app.route('/home', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
 def home():
     if 'username' not in session:
         return redirect(url_for('login'))
 
     subscriptions = getMusicSubscriptions(session['email'])
     returnMusic = []
+    res = None
 
     form = MusicSearchForm()
     if form.validate_on_submit():
-        returnMusic = searchMusic(
-            form.title.data, form.year.data, form.artist.data
-        )
-        if returnMusic != []:
-            return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions, musics=returnMusic, form=form)
-        else:
-            flash(f'No result is retrieved!', 'danger')
+        # Lambda function API Gateway address to search for music
+        url = 'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/searchMusic?'
+
+        if form.title.data or form.artist.data or form.year.data:
+            params = {}
+            if form.title.data:
+                params['title'] = form.title.data
+            if form.artist.data:
+                params['artist'] = form.artist.data
+            if form.year.data:
+                params['year'] = form.year.data
+            res = requests.get(url, params=params)
+
+    if res.status_code == 200:
+        returnMusic = res.json()
+        return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions, musics=returnMusic, form=form)
+    else:
+        flash(f'No result is retrieved!', 'danger')
 
     return render_template('home.html', title='Home', username=session['username'], subscriptions=subscriptions, musics=returnMusic, form=form)
 
 
-@ app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -76,7 +78,7 @@ def register():
     return render_template("register.html", form=form, title='Register')
 
 
-@ app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -120,4 +122,4 @@ def addMusicSubscription(musicTitle):
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)

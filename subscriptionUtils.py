@@ -1,4 +1,5 @@
 import boto3
+import requests
 from AWS_Creds import *
 
 SUBSCRIPTION_TABLE_NAME = 'user-music-subscriptions'
@@ -57,24 +58,12 @@ def addMusicSubscriptionS3(userEmail, musicTitle):
 
 
 def getMusicSubscriptions(userEmail):
-    table = dynamodb.Table(SUBSCRIPTION_TABLE_NAME)
-    response = table.query(
-        KeyConditionExpression=boto3.dynamodb.conditions.Key(
-            'user_email').eq(userEmail)
-    )
+    url = 'https://44lyi97043.execute-api.us-east-1.amazonaws.com/default/getMusicSubscription?email=' + \
+        str(userEmail)
 
-    musicTable = dynamodb.Table(MUSIC_TABLE_NAME)
-    subcriptions = []
+    response = requests.get(url)
 
-    for item in response['Items']:
-        musicDataResponse = musicTable.get_item(
-            Key={
-                'title': item['music_title']
-            }
-        )
-        subcriptions.append(musicDataResponse['Item'])
-
-    return subcriptions
+    return response.json()
 
 
 def musicSubcriptionExists(user_email, music_title):
